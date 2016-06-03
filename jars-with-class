@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+
+# http://stackoverflow.com/questions/1500141/find-a-jar-file-given-the-class-name
+
+ROOT=$1
+
+# Must be in / separated format
+CLASS=$2
+
+# There are 3 cases:
+#   1. output is same as file (file present)
+#   2. output is different from file (unexpected output)
+#   3. output is empty (no such file)
+sniffFile () {
+    local jarFile=$1
+    local classFile=$2
+    local output=$(jar tf $jarFile $classFile)
+
+    if [ "$output" == "$classFile" ]; then
+        echo $jarFile
+    elif [[ -z $output ]]; then
+        return
+    else
+        echo "Unexpected output for jar $jarFile and class $classFile: '$output'"
+        exit 1
+    fi
+}
+
+main () {
+    local root=$1
+    local class=$2
+    export -f sniffFile
+    find $root -name '*.jar' -exec bash -c 'sniffFile "$0" "$1"' {} $class \;
+}
+
+
+
+main $ROOT $CLASS
