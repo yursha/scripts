@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+
+# This script displays my changes in all repositories for the last week.
+# Assumes its located in the root folder and each folder underneath it is the git repository.
+# Before paging the diffs checks that there are no repositories in the 'dirty' state.
+# Otherwise prints the dirty repo's name and exits.
+
+# TODO: gather git repos in a list and then traverse that list instead of looking into each dir in each loop.
+
+main () {
+    root=$(realpath $1)
+    if [[ ! -d $root ]]; then
+        echo "$root is not a directory"
+        exit 1
+    fi
+
+    cd $root
+
+    for dir in $(ls -1)
+
+    do
+        if [[ -d $dir ]]; then
+            check_dirty $dir
+        fi
+    done
+
+    for dir in $(ls -1)
+    do
+        if [[ -d $dir ]]; then
+            check_changes $dir
+        fi
+    done
+}
+
+# Check that repository is not dirty.
+check_dirty () {
+    cd $1
+
+    # ignore directories which are not git repositories
+    if [[ ! -d ".git" ]]; then
+        return
+    fi
+
+    if [[ ! -z $(git status -s) ]]; then
+        echo "Repository is dirty:" $1
+        exit 1
+    fi
+    cd ..
+}
+
+# Show the changes for the recent week.
+check_changes () {
+    cd $1
+
+    # ignore directories which are not git repositories
+    if [[ ! -d ".git" ]]; then
+        return
+    fi
+
+    git log -p --since="1 week ago" --author="Alex Yursha"
+    cd ..
+}
+
+main $1

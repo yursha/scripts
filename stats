@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+
+declare -A languages
+
+currentRepository=''
+currentSection=''
+
+while read line; do
+
+    ([[ -z $line ]] || [[ $line == *"%"* ]]) && continue
+
+    if [[ $line == "Repository"* ]]
+    then
+        currentRepository=$(dirname ${line:11})
+    elif [[ $line == *":"* ]]
+    then
+        currentSection=${line::-1}
+        currentSection=${currentSection// /_}
+    else
+        [[ -z $currentSection ]] && continue
+        file=$currentRepository/$line
+        charCount=$(wc -m "$file" | cut -f1 -d' ')
+        oldCount=${languages[$currentSection]}
+        languages[$currentSection]=$(($oldCount + $charCount))
+    fi
+done
+
+totalCharCount=0
+for K in "${!languages[@]}"; do
+    totalCharCount=$(($totalCharCount + ${languages[$K]}))
+done
+
+result=''
+result=$result$(echo $totalCharCount total 100% | awk '{printf("%-50s %-20s %-20s\n", $1, $2, $3)}')"\n"
+# result=$result$(echo --------------------------------------------------------------------------------------------)"\n"
+
+for K in "${!languages[@]}"; do
+    currCharCount=${languages[$K]}
+    percent=$(bc -l <<< "scale=2; 100*$currCharCount/$totalCharCount")
+    result=$result$(echo $currCharCount "$K" $percent | awk -F\" '{printf("%-50s %-20s %-20s\n", $1, $2, $3)}')"\n"
+done
+
+echo -e $result | sort -nr | awk '{printf("%-15s %-25s %10.2f%%\n", $1, $2, $3)}'

@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+ROOTDIR=$(realpath $1)
+RESULT=$ROOTDIR/lang-analysis.txt
+LOG=$ROOTDIR/lang-analysis.log
+
+echo "Analyzing '$ROOTDIR' ..."
+
+cd $ROOTDIR
+
+echo "Writing results to $RESULT ..."
+echo "" > $RESULT
+
+echo "Writing log to $LOG ..."
+echo "" > $LOG
+
+for file in $(ls -1); do
+    if [ -d $file ]
+    then
+        cd $file
+        echo "Analyzing $(realpath $file) ..." >> $LOG
+        echo "Analyzing $(realpath $file) ..."
+        echo Repository $(realpath $file) >> $RESULT
+        linguist --breakdown >> $RESULT
+        cd ..
+    fi
+done
