@@ -1,2 +1,0 @@
-#!/usr/bin/env bash
-grep -rl -e 'extends Application<' -e 'extends Application\[' --include '*.java' --include '*.scala' . | sed -r 's/(\.*)\/src.*\/(.*).(scala|java)/\1 \2 (\3)/' | awk '{printf("%-70s %-35s %5s\n", $1, $2, $3)}'
