@@ -8,4 +8,8 @@ MAX=$(cat /sys/class/backlight/intel_backlight/max_brightness)
 DELTA=$1
 CURRENT=$(cat $BRIGHTNESS)
 NEW=$((CURRENT + DELTA))
-echo $((NEW > MAX ? MAX : NEW))  > $BRIGHTNESS
+
+NEW=$((NEW > MAX ? MAX : NEW))
+NEW=$((NEW < 0 ? 0 : NEW))
+
+echo $NEW  > $BRIGHTNESS
