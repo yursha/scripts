@@ -1,7 +1,7 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 
-# Given a number of git repositories as file paths prints SLOC for each.
-# File paths which are not git repositories are ignored.
+# Given a number of source code repositories as file paths prints SLOC for each.
+# Only supports Git and Subversion.
 
 set -e
 
@@ -12,14 +12,15 @@ do
       continue
     fi
 
-    if [ ! -d "$dir/.git" ]; then
-      echo "Warn: ignoring "[$dir]" - not a git repository"
+    if [ ! -d "$dir/.git" ] && [ ! -d "$dir/.svn" ]; then
+      echo "Warn: ignoring "[$dir]" - not a git or svn repository"
       continue
     fi
 
     loc=$(find "$dir" -path ./.git -prune -o -type f \
                   -exec grep -Iq . {} \; -and -print0 | \
-                  xargs -0 wc -l | tail -1 | cut -f2)
+                  xargs -0 wc -l | tail -1 | xargs \
+                  | cut -d' '  -f1)
 
     echo "$dir: $loc"
 done
