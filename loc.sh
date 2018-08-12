@@ -17,7 +17,7 @@ do
       continue
     fi
 
-    loc=$(find "$dir" -path ./.git -prune -o -type f \
+    loc=$(find "$dir" -path "$dir"/.git -prune -o -type f \
                   -exec grep -Iq . {} \; -and -print0 | \
                   xargs -0 wc -l | tail -1 | xargs \
                   | cut -d' '  -f1)
