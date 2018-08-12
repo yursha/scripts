@@ -2,17 +2,21 @@
 
 set -e
 
+echo "--------------------"
+echo "Activating Wi-Fi card"
+echo "--------------------"
 ip link set wlp1s0 up
-echo "--------------------"
-echo "Activated Wi-Fi card"
-echo "--------------------"
 
+echo "-------------------------------------"
+echo "Connecting to Wi-Fi access point"
+echo "-------------------------------------"
 wpa_supplicant -iwlp1s0 -c/etc/wpa_supplicant/wpa_supplicant.conf  -B
-echo "-------------------------------------"
-echo "INFO: Connected to Wi-Fi access point"
-echo "-------------------------------------"
 
-dhcpcd wlp1s0
 echo "-------------------"
-echo "Obtained IP address"
+echo "Obtaining IP address"
+echo "-------------------"
+dhcpcd wlp1s0
+
+echo "-------------------"
+echo "Init completed"
 echo "-------------------"
